@@ -1,6 +1,7 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth.forms import UserCreationForm,  AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
@@ -11,34 +12,16 @@ from .models import Task
 def home(request):
     return render(request, "home.html")
 
-def edit_task(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect('tasks')
-    else:
-        form = TaskForm(instance=task)
-
-    return render(request, 'tasks/edit_task.html', {'form': form})
-
-def delete_task(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-
-    if request.method == 'POST':
-        task.delete()
-        return redirect('tasks')
-
-    return render(request, 'tasks/confirm_delete.html', {'task': task})
-
-
 def tasks(request):
     tasks = Task.objects.filter(user=request.user,
                                 datecompleted__isnull=True)
     return render(request,"tasks.html",
                    {"tasks":tasks})
+
+def select(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    return render(request, 'select.html', {'task': task})
+
 
 def create_task(request):
     if request.method == "GET":
@@ -58,6 +41,33 @@ def create_task(request):
                    "create_task.html",
                    {"form": TaskForm(),
                      "error":"Error al crear la tarea"})
+
+def editar(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+
+    if request.method == "GET":
+        form = TaskForm(instance=task)
+        return render(request, "editar.html", {"form": form})
+    else:
+        try:
+            form = TaskForm(request.POST, instance=task)
+            if form.is_valid():
+                form.save()
+                return redirect("tasks")
+            else:
+                return render(request, "editar.html", {"form": form, "error": "Datos inválidos"})
+        except ValueError:
+            return render(request, "editar.html", {"form": form, "error": "Error al editar la tarea"})
+        
+def eliminar(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+
+    if request.method == "POST":
+        task.delete()
+        return redirect("tasks")
+
+    return render(request, "eliminar.html", {"task": task})
+
 
 def signout(request):
     logout(request)
@@ -106,3 +116,4 @@ def signup(request):
                               'signup.html',
                               {"form": UserCreationForm(),
                                "error":"Error, Las contraseñas no coinciden"})
+        

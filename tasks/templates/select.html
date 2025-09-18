@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Detalles de la Tarea</h1>
+
+<ul>
+    <li><strong>Título:</strong> {{ task.title }}</li>
+    <li><strong>Descripción:</strong> {{ task.description }}</li>
+    <li><strong>Usuario:</strong> {{ task.user.username }}</li>
+    <li><strong>Creada:</strong> {{ task.created }}</li>
+    <li><strong>Completada:</strong> {{ task.datecompleted|yesno:"Sí,No" }}</li>
+</ul>
+
+<a href="{% url 'editar' task.id %}" class="btn btn-primary" style="margin-right: 10px;">Editar</a>
+
+<form action="{% url 'eliminar' task.id %}" method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+</form>
+
+<br><br>
+<a href="{% url 'tasks' %}" class="btn btn-secondary">Volver a la lista de tareas</a>
+{% endblock %}

@@ -2,29 +2,25 @@
 
 {% block content %}
 <h1>Tareas</h1>
+<a href="{% url 'create_task' %}" class="btn btn-success mb-3">Crear Nueva Tarea</a>
 <ul>
-{% for task in tasks %}
-    <li>
-        {% if task.important %}
-            <strong>{{ task.title }}</strong>
-        {% else %}
-            {{ task.title }}
-        {% endif %}
-        <p>{{ task.description }}</p>
-        <p>{{ task.user.username }}</p>
-        <p>Creada: {{ task.created }}</p>
-        <p>Completada: {{ task.datecompleted }}</p>
-
-        <!-- Botones de Editar y Eliminar -->
-        <a href="{% url 'edit_task' task.id %}" class="btn btn-primary">Editar</a>
-
-        <form action="{% url 'delete_task' task.id %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
-    </li>
-{% empty %}
-    <li>No hay tareas disponibles.</li>
-{% endfor %}
+    {% for task in tasks %}
+        <li style="margin-bottom: 20px;">
+            {% if task.important %}
+                <strong>{{ task.title }}</strong>
+            {% else %}
+                {{ task.title }}
+            {% endif %}
+            <p>{{ task.description }}</p>
+            <p>{{ task.user.username }}</p>
+            <p>Creada: {{ task.created }}</p>
+            <p>Completada: {{ task.datecompleted }}</p>
+            
+            <a href="{% url 'select' task.id %}" class="btn btn-success btn-sm">Seleccionar</a>
+        </li>
+        
+    {% empty %}
+        <li>No hay tareas disponibles.</li>
+    {% endfor %}
 </ul>
 {% endblock %}
